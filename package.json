@@ -5,5 +5,8 @@
   "description": "Radar de nichos y generador de mensajes para la comunidad Imperio",
   "scripts": {
     "build": "node scripts/build-index.js"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^2.8.0"
   }
 }
