@@ -1,0 +1,22 @@
+{
+  "id": "YYYY-MM-DD-tu-nombre",
+  "autor": "Tu nombre",
+  "perfil_skool": null,
+  "pais": null,
+  "fecha_cierre": "YYYY-MM-DD",
+  "rubro": "clinicas_salud",
+  "rubro_otro": null,
+  "dolor_especifico": "descripción corta y concreta del dolor que resolviste",
+  "que_construyo": "sistema_interno",
+  "ya_tenia_cliente": true,
+  "precio_implementacion": 0,
+  "moneda": "USD",
+  "precio_implementacion_usd": 0,
+  "mantenimiento_mensual": null,
+  "mantenimiento_moneda": null,
+  "tiempo_hasta_cobro_dias": null,
+  "origen_cliente": "pajaro_en_mano",
+  "mensaje_usado": null,
+  "link_caso": null,
+  "tags": []
+}

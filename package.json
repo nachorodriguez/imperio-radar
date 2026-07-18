@@ -1,0 +1,9 @@
+{
+  "name": "imperio-radar",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Radar de nichos y generador de mensajes para la comunidad Imperio",
+  "scripts": {
+    "build": "node scripts/build-index.js"
+  }
+}

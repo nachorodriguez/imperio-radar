@@ -1,0 +1,22 @@
+{
+  "id": "2026-07-17-hennadiy-velychko",
+  "autor": "Hennadiy Velychko",
+  "perfil_skool": "https://www.skool.com/@710ee33100424962b4d6f10aa87724c6",
+  "pais": null,
+  "fecha_cierre": null,
+  "rubro": "otro",
+  "rubro_otro": "sin confirmar",
+  "dolor_especifico": null,
+  "que_construyo": "agente_whatsapp",
+  "ya_tenia_cliente": null,
+  "precio_implementacion": 6500,
+  "moneda": "EUR",
+  "precio_implementacion_usd": null,
+  "mantenimiento_mensual": null,
+  "mantenimiento_moneda": null,
+  "tiempo_hasta_cobro_dias": null,
+  "origen_cliente": null,
+  "mensaje_usado": null,
+  "link_caso": "https://www.skool.com/imperio/de-la-guia-a-6500-en-un-cliente-asi-implementamos-los-agentes-de-whatsapp-caso-real",
+  "tags": ["seed", "pais_pendiente", "rubro_pendiente", "precio_usd_pendiente"]
+}

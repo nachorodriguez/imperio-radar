@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radar Imperial — encuentra a quién venderle</title>
+<meta name="description" content="Radar de nichos y generador de mensajes basado en ventas reales de la comunidad Imperio.">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="eyebrow">Radar Imperial · casos reales de venta</p>
+    <h1>No te falta producto.<br>Te falta saber a quién venderlo.</h1>
+    <p class="lede">Cada caso de este radar es una venta real de un Imperial, con rubro, país y precio. Elige lo que sabes construir, mira dónde nadie de tu país está apuntando todavía, y sal con tu Mensaje Imperial listo.</p>
+  </header>
+
+  <section id="radar">
+    <h2>Radar de nichos</h2>
+    <p class="section-sub">Filtra por tu país para ver qué tan disputado está cada rubro. La saturación es local: alguien vendiendo en otro país no compite contigo.</p>
+
+    <div class="field-row">
+      <div>
+        <label for="pais-filtro">Tu país</label>
+        <select id="pais-filtro">
+          <option value="">Todos</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="radar-grid" class="grid"></div>
+  </section>
+
+  <section id="generador">
+    <h2>Generador de mensaje</h2>
+    <p class="section-sub">Elige lo que ya sabes construir y el nicho que te interesó arriba. Cruzamos ambos con casos reales para armar tu precio ancla y tu Mensaje Imperial.</p>
+
+    <div class="field-row">
+      <div>
+        <label for="capacidad-select">Qué sabes construir</label>
+        <select id="capacidad-select"></select>
+      </div>
+      <div>
+        <label for="rubro-select">Nicho objetivo</label>
+        <select id="rubro-select"></select>
+      </div>
+      <div>
+        <label for="pais-select">Tu país</label>
+        <select id="pais-select"></select>
+      </div>
+    </div>
+
+    <button id="generar-btn">Generar mensaje imperial</button>
+
+    <div id="output" class="output">
+      <p class="stamp">Mensaje imperial · listo para copiar</p>
+      <pre id="mensaje-texto"></pre>
+      <div class="meta" id="mensaje-meta"></div>
+      <div class="field-row" style="margin-top:18px;">
+        <button id="copiar-btn" class="ghost">Copiar mensaje</button>
+        <button id="aportar-btn" class="ghost">Cuando cierres, aporta tu caso →</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Este radar crece con cada venta que la comunidad reporta. Si cerraste un cliente esta semana, súmalo — el <a href="https://github.com/" id="repo-link" target="_blank" rel="noopener">repo está abierto</a> para todos los Imperiales.</p>
+  </footer>
+
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>

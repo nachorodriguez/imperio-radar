@@ -1,0 +1,22 @@
+{
+  "id": "2026-07-18-reito-geldres",
+  "autor": "Reito Geldres",
+  "perfil_skool": "https://www.skool.com/@92fd8862cae0436e93b714b401ee608d",
+  "pais": null,
+  "fecha_cierre": null,
+  "rubro": "clinicas_salud",
+  "rubro_otro": null,
+  "dolor_especifico": "agente conversacional en GHL para automatizar la clínica dental",
+  "que_construyo": "agente_whatsapp",
+  "ya_tenia_cliente": null,
+  "precio_implementacion": 1000,
+  "moneda": "USD",
+  "precio_implementacion_usd": 1000,
+  "mantenimiento_mensual": 147,
+  "mantenimiento_moneda": "USD",
+  "tiempo_hasta_cobro_dias": null,
+  "origen_cliente": null,
+  "mensaje_usado": null,
+  "link_caso": "https://www.skool.com/imperio/automatizacion-de-clinica-dental-agente-ia-conversacional-en-ghl-1000-usd-147-usd-mensual",
+  "tags": ["seed", "pais_pendiente"]
+}

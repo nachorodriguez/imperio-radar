@@ -1,0 +1,22 @@
+[
+  {
+    "id": "sistema_interno",
+    "nombre": "Sistema interno",
+    "descripcion": "automatización o herramienta interna para el negocio del cliente"
+  },
+  {
+    "id": "web_landing",
+    "nombre": "Web o landing",
+    "descripcion": "construcción en Claude Code + Claude Design + deploy"
+  },
+  {
+    "id": "agente_whatsapp",
+    "nombre": "Agente de WhatsApp",
+    "descripcion": "responde y agenda solo"
+  },
+  {
+    "id": "diagnostico_roadmap",
+    "nombre": "Diagnóstico IA + roadmap",
+    "descripcion": "15 min de preguntas + plan de qué automatizar primero"
+  }
+]

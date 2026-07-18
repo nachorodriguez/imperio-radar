@@ -1,0 +1,37 @@
+[
+  {
+    "id": "clinicas_salud",
+    "nombre": "Clínicas y salud",
+    "dolor_generico": "se pierden citas de último minuto y las consultas no se responden a tiempo"
+  },
+  {
+    "id": "construccion_industria",
+    "nombre": "Construcción e industria",
+    "dolor_generico": "las cotizaciones tardan días en salir y se pierde el seguimiento a clientes"
+  },
+  {
+    "id": "agencias",
+    "nombre": "Agencias",
+    "dolor_generico": "las cotizaciones y reportes a cliente toman demasiado tiempo manual"
+  },
+  {
+    "id": "seguros",
+    "nombre": "Seguros",
+    "dolor_generico": "el seguimiento a pólizas y cotizaciones se pierde entre chats y correos"
+  },
+  {
+    "id": "hoteles",
+    "nombre": "Hoteles",
+    "dolor_generico": "las reservas y consultas fuera de horario no se responden a tiempo"
+  },
+  {
+    "id": "inmobiliarias",
+    "nombre": "Inmobiliarias",
+    "dolor_generico": "los leads de propiedades no reciben seguimiento a tiempo"
+  },
+  {
+    "id": "otro",
+    "nombre": "Otro rubro",
+    "dolor_generico": "hay tareas repetitivas del día a día que consumen demasiado tiempo"
+  }
+]

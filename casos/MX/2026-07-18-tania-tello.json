@@ -1,0 +1,22 @@
+{
+  "id": "2026-07-18-tania-tello",
+  "autor": "Tania Tello",
+  "perfil_skool": "https://www.skool.com/@a5cc2f300aa04eed83d52d767713762b",
+  "pais": "MX",
+  "fecha_cierre": null,
+  "rubro": "seguros",
+  "rubro_otro": null,
+  "dolor_especifico": "app para promotorías de seguros en México",
+  "que_construyo": "sistema_interno",
+  "ya_tenia_cliente": null,
+  "precio_implementacion": 5000,
+  "moneda": "USD",
+  "precio_implementacion_usd": 5000,
+  "mantenimiento_mensual": null,
+  "mantenimiento_moneda": null,
+  "tiempo_hasta_cobro_dias": 2,
+  "origen_cliente": null,
+  "mensaje_usado": null,
+  "link_caso": "https://www.skool.com/imperio/vendi-mi-primera-app-para-promotorias-de-seguros-en-mexico-en-5000usd",
+  "tags": ["seed"]
+}

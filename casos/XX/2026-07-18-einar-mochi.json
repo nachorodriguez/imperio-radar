@@ -1,0 +1,22 @@
+{
+  "id": "2026-07-18-einar-mochi",
+  "autor": "Einar Mochi",
+  "perfil_skool": "https://www.skool.com/@bf1d8424b9894f069f70daebc63d3d25",
+  "pais": null,
+  "fecha_cierre": null,
+  "rubro": "otro",
+  "rubro_otro": "sin confirmar",
+  "dolor_especifico": null,
+  "que_construyo": "web_landing",
+  "ya_tenia_cliente": null,
+  "precio_implementacion": 1375,
+  "moneda": "USD",
+  "precio_implementacion_usd": 1375,
+  "mantenimiento_mensual": 75,
+  "mantenimiento_moneda": "USD",
+  "tiempo_hasta_cobro_dias": 1,
+  "origen_cliente": null,
+  "mensaje_usado": null,
+  "link_caso": "https://www.skool.com/imperio/37da7882",
+  "tags": ["seed", "pais_pendiente"]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "2026-07-17-alan-mardones",
+  "autor": "Alan Mardones",
+  "perfil_skool": "https://www.skool.com/@51054ec52d434af18f2f86dee57ff2e3",
+  "pais": null,
+  "fecha_cierre": null,
+  "rubro": "otro",
+  "rubro_otro": "sistema de conocimiento con RAG",
+  "dolor_especifico": null,
+  "que_construyo": "sistema_interno",
+  "ya_tenia_cliente": null,
+  "precio_implementacion": 20000,
+  "moneda": "USD",
+  "precio_implementacion_usd": 20000,
+  "mantenimiento_mensual": null,
+  "mantenimiento_moneda": null,
+  "tiempo_hasta_cobro_dias": null,
+  "origen_cliente": null,
+  "mensaje_usado": null,
+  "link_caso": "https://www.skool.com/imperio/cerre-mi-primer-gran-proyecto-por-usd-20k",
+  "tags": ["seed", "pais_pendiente", "rubro_pendiente"]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "2026-07-18-maria-jose-araya",
+  "autor": "Maria Jose Araya",
+  "perfil_skool": "https://www.skool.com/@0234649c52564abca9ff3f66c079016b",
+  "pais": null,
+  "fecha_cierre": null,
+  "rubro": "otro",
+  "rubro_otro": "sin confirmar",
+  "dolor_especifico": null,
+  "que_construyo": null,
+  "ya_tenia_cliente": null,
+  "precio_implementacion": 2000,
+  "moneda": "USD",
+  "precio_implementacion_usd": 2000,
+  "mantenimiento_mensual": null,
+  "mantenimiento_moneda": null,
+  "tiempo_hasta_cobro_dias": null,
+  "origen_cliente": null,
+  "mensaje_usado": null,
+  "link_caso": "https://www.skool.com/imperio/de-0-a-mi-primer-cliente-por-2000-usd",
+  "tags": ["seed", "pais_pendiente", "rubro_pendiente"]
+}
