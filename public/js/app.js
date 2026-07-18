@@ -117,6 +117,8 @@ function renderRadar() {
       : null;
 
     const sat = nivelSaturacion(paisFiltro ? casosLocales.length : casosRubro.length);
+    const casosParaListar = (paisFiltro ? casosLocales : casosRubro)
+      .slice().sort((a, b) => (b.fecha_cierre || "").localeCompare(a.fecha_cierre || ""));
 
     const card = document.createElement("div");
     card.className = "card";
@@ -127,6 +129,24 @@ function renderRadar() {
       <div class="stat-row"><span>Ticket típico</span><strong>${ticketTexto}</strong></div>
       <div class="stat-row"><span>Se vende primero</span><strong>${ofertaFrecuente ? nombreCapacidad(ofertaFrecuente) : "sin datos"}</strong></div>
       <span class="badge ${sat.cls}">${sat.label}</span>
+      ${casosParaListar.length ? `
+        <details class="casos-detalle">
+          <summary>Ver ${casosParaListar.length === 1 ? "el caso real" : `los ${casosParaListar.length} casos reales`}</summary>
+          <ul>
+            ${casosParaListar.map(c => `
+              <li>
+                <div class="caso-autor">${c.autor}${c.pais ? ` · ${c.pais}` : ""}</div>
+                <div class="caso-detalle-texto">${nombreCapacidad(c.que_construyo)}${typeof c.precio_implementacion === "number" ? ` · ${MONEDA_SIMBOLO[c.moneda] || c.moneda} ${c.precio_implementacion}` : ""}</div>
+                <div class="caso-links">
+                  ${c.perfil_skool ? `<a href="${c.perfil_skool}" target="_blank" rel="noopener">Perfil de Skool</a>` : ""}
+                  ${c.link_caso ? `<a href="${c.link_caso}" target="_blank" rel="noopener">Ver post de cierre</a>` : ""}
+                  ${!c.perfil_skool && !c.link_caso ? `<span class="sin-contacto">sin contacto compartido</span>` : ""}
+                </div>
+              </li>
+            `).join("")}
+          </ul>
+        </details>
+      ` : ""}
     `;
     grid.appendChild(card);
   });
@@ -137,20 +157,18 @@ function nombreCapacidad(id) {
   return c ? c.nombre : id;
 }
 
-function slugify(str) {
-  return str
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
-function hoyISO() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function manejarAporte(e) {
+async function manejarAporte(e) {
   e.preventDefault();
+  const nota = document.getElementById("af-nota");
+  const submitBtn = document.getElementById("af-submit");
+
+  // Honeypot: si un bot llenó este campo invisible, lo descartamos en silencio.
+  if (document.getElementById("af-web").value) {
+    nota.textContent = "Gracias.";
+    document.getElementById("aportar-form").reset();
+    return;
+  }
+
   const autor = document.getElementById("af-autor").value.trim();
   const perfil = document.getElementById("af-perfil").value.trim() || null;
   const pais = document.getElementById("af-pais").value;
@@ -164,54 +182,55 @@ function manejarAporte(e) {
   const origen = document.getElementById("af-origen").value;
   const yaTenia = document.getElementById("af-yatenia").value === "true";
   const link = document.getElementById("af-link").value.trim() || null;
-  const nota = document.getElementById("af-nota");
 
   if (!autor || !pais || !rubro || !construyo || !dolor || !precioStr || isNaN(Number(precioStr))) {
     nota.textContent = "Faltan campos obligatorios — revisa nombre, país, rubro, qué construiste, dolor y precio.";
     return;
   }
 
-  const precio = Number(precioStr);
-  const mantenimiento = mantStr && !isNaN(Number(mantStr)) ? Number(mantStr) : null;
-  const dias = diasStr && !isNaN(Number(diasStr)) ? Number(diasStr) : null;
-  const fecha = hoyISO();
-  const slug = slugify(autor) || "imperial";
-  const id = `${fecha}-${slug}`;
-
-  const caso = {
-    id,
+  const payload = {
     autor,
     perfil_skool: perfil,
     pais,
-    fecha_cierre: fecha,
     rubro,
-    rubro_otro: null,
-    dolor_especifico: dolor,
     que_construyo: construyo,
-    ya_tenia_cliente: yaTenia,
-    precio_implementacion: precio,
+    dolor_especifico: dolor,
+    precio_implementacion: Number(precioStr),
     moneda,
-    // No convertimos monedas: solo se llena si el propio caso ya está en USD.
-    precio_implementacion_usd: moneda === "USD" ? precio : null,
-    mantenimiento_mensual: mantenimiento,
-    mantenimiento_moneda: mantenimiento ? moneda : null,
-    tiempo_hasta_cobro_dias: dias,
+    mantenimiento_mensual: mantStr && !isNaN(Number(mantStr)) ? Number(mantStr) : null,
+    tiempo_hasta_cobro_dias: diasStr && !isNaN(Number(diasStr)) ? Number(diasStr) : null,
     origen_cliente: origen,
-    mensaje_usado: null,
+    ya_tenia_cliente: yaTenia,
     link_caso: link,
-    tags: ["comunidad"],
   };
 
-  const filename = `casos/${pais}/${id}.json`;
-  const contenido = JSON.stringify(caso, null, 2);
-  const url = `${REPO_URL}/new/main?filename=${encodeURIComponent(filename)}&value=${encodeURIComponent(contenido)}`;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Enviando...";
+  nota.textContent = "";
 
-  window.open(url, "_blank");
+  try {
+    const res = await fetch("/api/aportar-caso", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const result = await res.json();
 
-  nota.innerHTML =
-    `Se abrió GitHub en una pestaña nueva con <code>${filename}</code> ya armado. ` +
-    `Si no colaboras directo en el repo, GitHub te va a ofrecer crear tu propia copia (fork) — acepta y dale a <strong>Propose new file</strong>, eso abre el Pull Request solo. ` +
-    `Si ya colaboras en el repo, elige <strong>Create a new branch for this commit and start a pull request</strong> en vez de comitear directo a main.`;
+    if (result.ok) {
+      nota.innerHTML =
+        `Listo — tu caso quedó registrado y se abrió un Pull Request para revisión. ` +
+        (result.prUrl ? `<a href="${result.prUrl}" target="_blank" rel="noopener">Ver el PR aquí</a>. ` : "") +
+        `En cuanto se apruebe, va a aparecer en el Radar.`;
+      document.getElementById("aportar-form").reset();
+    } else {
+      nota.textContent = result.error || "Algo falló al enviar tu caso. Intenta de nuevo.";
+    }
+  } catch (err) {
+    nota.textContent = "No se pudo conectar. Revisa tu conexión e intenta de nuevo.";
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Aportar caso";
+  }
 }
 
 function generarMensaje() {

@@ -203,6 +203,52 @@ footer a{color:var(--gold);}
   padding:16px 0;
 }
 
+.hp{
+  position:absolute;
+  left:-9999px;
+  top:auto;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+}
+
+.casos-detalle{
+  margin-top:14px;
+  border-top:1px solid var(--line);
+  padding-top:10px;
+}
+.casos-detalle summary{
+  cursor:pointer;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--gold);
+}
+.casos-detalle summary:hover{color:#dab434;}
+.casos-detalle ul{list-style:none; margin:10px 0 0; padding:0;}
+.casos-detalle li{
+  border-top:1px solid var(--line);
+  padding:10px 0;
+}
+.casos-detalle li:first-child{border-top:none; padding-top:8px;}
+.caso-autor{font-size:13px; color:var(--text); font-weight:500;}
+.caso-detalle-texto{font-size:12px; color:var(--text-dim); margin-top:2px;}
+.caso-links{margin-top:6px; display:flex; gap:14px; flex-wrap:wrap;}
+.caso-links a{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px;
+  color:var(--gold);
+  text-decoration:none;
+}
+.caso-links a:hover{text-decoration:underline;}
+.caso-links .sin-contacto{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px;
+  color:var(--text-dim);
+  font-style:italic;
+}
+
 @media (prefers-reduced-motion:no-preference){
   .card{transition:border-color .15s ease;}
   .card:hover{border-color:var(--gold-dim);}
