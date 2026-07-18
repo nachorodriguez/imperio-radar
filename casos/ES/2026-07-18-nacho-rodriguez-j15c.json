@@ -1,0 +1,24 @@
+{
+  "id": "2026-07-18-nacho-rodriguez-j15c",
+  "autor": "Nacho Rodriguez",
+  "perfil_skool": "https://www.skool.com/@nacho-rodriguez-8517?g=imperio",
+  "pais": "ES",
+  "fecha_cierre": "2026-07-18",
+  "rubro": "clinicas_salud",
+  "rubro_otro": null,
+  "dolor_especifico": "pierden citas web",
+  "que_construyo": "agente_whatsapp",
+  "ya_tenia_cliente": true,
+  "precio_implementacion": 1000,
+  "moneda": "EUR",
+  "precio_implementacion_usd": null,
+  "mantenimiento_mensual": 200,
+  "mantenimiento_moneda": "EUR",
+  "tiempo_hasta_cobro_dias": 0,
+  "origen_cliente": "pajaro_en_mano",
+  "mensaje_usado": null,
+  "link_caso": null,
+  "tags": [
+    "comunidad"
+  ]
+}
