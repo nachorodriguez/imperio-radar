@@ -1,7 +1,18 @@
 // ==== CONFIG ====
-// Una vez creado el repo real en GitHub, reemplaza esto — se usa para el
-// botón "aporta tu caso" y para el link del footer.
-const REPO_URL = "https://github.com/TU-USUARIO/imperio-radar";
+// Confirmado desde el deploy de Netlify — verifica que coincide con tu repo real.
+const REPO_URL = "https://github.com/nachorodriguez/imperio-radar";
+
+const PAIS_MONEDA = {
+  MX: "MXN", CO: "COP", AR: "ARS", CL: "CLP", PE: "PEN", EC: "USD",
+  ES: "EUR", UY: "UYU", BO: "BOB", PY: "PYG", VE: "VES", GT: "GTQ",
+  CR: "CRC", PA: "USD", DO: "DOP", HN: "HNL", SV: "USD", NI: "NIO", US: "USD",
+};
+
+const MONEDA_SIMBOLO = {
+  USD: "USD", EUR: "€", MXN: "MX$", COP: "COP$", ARS: "AR$", CLP: "CLP$",
+  PEN: "S/", UYU: "UY$", BOB: "Bs", PYG: "₲", VES: "Bs.S", GTQ: "Q",
+  CRC: "₡", DOP: "RD$", HNL: "L", NIO: "C$",
+};
 
 const PAISES = [
   ["MX", "México"], ["CO", "Colombia"], ["AR", "Argentina"], ["CL", "Chile"],
@@ -27,17 +38,36 @@ async function cargarDatos() {
 function poblarSelects() {
   const paisFiltro = document.getElementById("pais-filtro");
   const paisSelect = document.getElementById("pais-select");
+  const afPais = document.getElementById("af-pais");
+  const afMoneda = document.getElementById("af-moneda");
   PAISES.forEach(([id, nombre]) => {
-    const opt1 = new Option(nombre, id);
-    paisFiltro.add(opt1);
+    paisFiltro.add(new Option(nombre, id));
     paisSelect.add(new Option(nombre, id));
+    afPais.add(new Option(nombre, id));
+  });
+  Object.entries(MONEDA_SIMBOLO).forEach(([codigo, simbolo]) => {
+    afMoneda.add(new Option(`${codigo} (${simbolo})`, codigo));
   });
 
   const capSelect = document.getElementById("capacidad-select");
-  CAPACIDADES.forEach(c => capSelect.add(new Option(c.nombre, c.id)));
+  const afConstruyo = document.getElementById("af-construyo");
+  CAPACIDADES.forEach(c => {
+    capSelect.add(new Option(c.nombre, c.id));
+    afConstruyo.add(new Option(c.nombre, c.id));
+  });
 
   const rubroSelect = document.getElementById("rubro-select");
-  RUBROS.forEach(r => rubroSelect.add(new Option(r.nombre, r.id)));
+  const afRubro = document.getElementById("af-rubro");
+  RUBROS.forEach(r => {
+    rubroSelect.add(new Option(r.nombre, r.id));
+    afRubro.add(new Option(r.nombre, r.id));
+  });
+
+  // Auto-sugiere la moneda cuando cambia el país del formulario de aporte.
+  afPais.addEventListener("change", () => {
+    const sugerida = PAIS_MONEDA[afPais.value];
+    if (sugerida) afMoneda.value = sugerida;
+  });
 
   document.getElementById("repo-link").href = REPO_URL;
 }
@@ -66,9 +96,20 @@ function renderRadar() {
       ? casosRubro.filter(c => c.pais === paisFiltro)
       : casosRubro;
 
-    const precios = casosRubro
-      .map(c => c.precio_implementacion_usd)
-      .filter(p => typeof p === "number");
+    const monedaLocal = PAIS_MONEDA[paisFiltro];
+    const casosMismaMoneda = casosLocales.filter(
+      c => typeof c.precio_implementacion === "number" && c.moneda === monedaLocal
+    );
+
+    let ticketTexto;
+    if (casosMismaMoneda.length) {
+      const simbolo = MONEDA_SIMBOLO[monedaLocal] || monedaLocal;
+      ticketTexto = `${simbolo} ${mediana(casosMismaMoneda.map(c => c.precio_implementacion))}`;
+    } else {
+      const preciosUsd = casosRubro.map(c => c.precio_implementacion_usd).filter(p => typeof p === "number");
+      ticketTexto = preciosUsd.length ? `USD ${mediana(preciosUsd)} · global` : "sin datos";
+    }
+
     const ofertas = casosRubro.map(c => c.que_construyo).filter(Boolean);
     const ofertaFrecuente = ofertas.length
       ? Object.entries(ofertas.reduce((acc, o) => (acc[o] = (acc[o] || 0) + 1, acc), {}))
@@ -83,7 +124,7 @@ function renderRadar() {
       <p class="sector">${paisFiltro ? "en tu país" : "global"}</p>
       <h3>${rubro.nombre}</h3>
       <div class="stat-row"><span>Casos registrados</span><strong>${paisFiltro ? casosLocales.length : casosRubro.length}</strong></div>
-      <div class="stat-row"><span>Ticket típico</span><strong>${precios.length ? "USD " + mediana(precios) : "sin datos"}</strong></div>
+      <div class="stat-row"><span>Ticket típico</span><strong>${ticketTexto}</strong></div>
       <div class="stat-row"><span>Se vende primero</span><strong>${ofertaFrecuente ? nombreCapacidad(ofertaFrecuente) : "sin datos"}</strong></div>
       <span class="badge ${sat.cls}">${sat.label}</span>
     `;
@@ -94,6 +135,83 @@ function renderRadar() {
 function nombreCapacidad(id) {
   const c = CAPACIDADES.find(x => x.id === id);
   return c ? c.nombre : id;
+}
+
+function slugify(str) {
+  return str
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+function hoyISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function manejarAporte(e) {
+  e.preventDefault();
+  const autor = document.getElementById("af-autor").value.trim();
+  const perfil = document.getElementById("af-perfil").value.trim() || null;
+  const pais = document.getElementById("af-pais").value;
+  const rubro = document.getElementById("af-rubro").value;
+  const construyo = document.getElementById("af-construyo").value;
+  const dolor = document.getElementById("af-dolor").value.trim();
+  const precioStr = document.getElementById("af-precio").value.trim();
+  const moneda = document.getElementById("af-moneda").value;
+  const mantStr = document.getElementById("af-mantenimiento").value.trim();
+  const diasStr = document.getElementById("af-dias").value.trim();
+  const origen = document.getElementById("af-origen").value;
+  const yaTenia = document.getElementById("af-yatenia").value === "true";
+  const link = document.getElementById("af-link").value.trim() || null;
+  const nota = document.getElementById("af-nota");
+
+  if (!autor || !pais || !rubro || !construyo || !dolor || !precioStr || isNaN(Number(precioStr))) {
+    nota.textContent = "Faltan campos obligatorios — revisa nombre, país, rubro, qué construiste, dolor y precio.";
+    return;
+  }
+
+  const precio = Number(precioStr);
+  const mantenimiento = mantStr && !isNaN(Number(mantStr)) ? Number(mantStr) : null;
+  const dias = diasStr && !isNaN(Number(diasStr)) ? Number(diasStr) : null;
+  const fecha = hoyISO();
+  const slug = slugify(autor) || "imperial";
+  const id = `${fecha}-${slug}`;
+
+  const caso = {
+    id,
+    autor,
+    perfil_skool: perfil,
+    pais,
+    fecha_cierre: fecha,
+    rubro,
+    rubro_otro: null,
+    dolor_especifico: dolor,
+    que_construyo: construyo,
+    ya_tenia_cliente: yaTenia,
+    precio_implementacion: precio,
+    moneda,
+    // No convertimos monedas: solo se llena si el propio caso ya está en USD.
+    precio_implementacion_usd: moneda === "USD" ? precio : null,
+    mantenimiento_mensual: mantenimiento,
+    mantenimiento_moneda: mantenimiento ? moneda : null,
+    tiempo_hasta_cobro_dias: dias,
+    origen_cliente: origen,
+    mensaje_usado: null,
+    link_caso: link,
+    tags: ["comunidad"],
+  };
+
+  const filename = `casos/${pais}/${id}.json`;
+  const contenido = JSON.stringify(caso, null, 2);
+  const url = `${REPO_URL}/new/main?filename=${encodeURIComponent(filename)}&value=${encodeURIComponent(contenido)}`;
+
+  window.open(url, "_blank");
+
+  nota.innerHTML =
+    `Se abrió GitHub en una pestaña nueva con <code>${filename}</code> ya armado. ` +
+    `Si no colaboras directo en el repo, GitHub te va a ofrecer crear tu propia copia (fork) — acepta y dale a <strong>Propose new file</strong>, eso abre el Pull Request solo. ` +
+    `Si ya colaboras en el repo, elige <strong>Create a new branch for this commit and start a pull request</strong> en vez de comitear directo a main.`;
 }
 
 function generarMensaje() {
@@ -108,21 +226,36 @@ function generarMensaje() {
   const casosLocales = paisId ? casosRubro.filter(c => c.pais === paisId) : [];
   const base = casosLocales.length ? casosLocales : casosRubro;
 
-  const precios = base.map(c => c.precio_implementacion_usd).filter(p => typeof p === "number");
-  const precioAncla = precios.length ? mediana(precios) : null;
   const conPrecedente = base.length > 0;
   const dolorCaso = base.find(c => c.dolor_especifico)?.dolor_especifico;
   const dolor = dolorCaso || rubro.dolor_generico;
 
-  const precioTexto = precioAncla
-    ? `alrededor de USD ${precioAncla}, según lo que ya se ha cobrado en este rubro`
-    : `entre USD 500 y 2.000 (rango típico de un primer proyecto en la comunidad)`;
+  // Prioridad 1: casos reales EN tu país, declarados en tu propia moneda local.
+  const monedaLocal = PAIS_MONEDA[paisId];
+  const casosMismaMoneda = casosLocales.filter(
+    c => typeof c.precio_implementacion === "number" && c.moneda === monedaLocal
+  );
+
+  // Prioridad 2: referencia global en USD (nunca se convierte, se etiqueta como tal).
+  const preciosUsdGlobal = base.map(c => c.precio_implementacion_usd).filter(p => typeof p === "number");
+  const precioAnclaUsd = preciosUsdGlobal.length ? mediana(preciosUsdGlobal) : null;
+
+  let precioTexto;
+  if (casosMismaMoneda.length) {
+    const precioLocal = mediana(casosMismaMoneda.map(c => c.precio_implementacion));
+    const simbolo = MONEDA_SIMBOLO[monedaLocal] || monedaLocal;
+    precioTexto = `alrededor de ${simbolo} ${precioLocal} — dato real de un caso cerrado en tu país`;
+  } else if (precioAnclaUsd) {
+    precioTexto = `alrededor de USD ${precioAnclaUsd} — referencia global, todavía no hay un caso registrado en tu moneda local`;
+  } else {
+    precioTexto = `entre USD 500 y 2.000 — rango típico de un primer proyecto en la comunidad (referencia global)`;
+  }
 
   const mensaje =
 `Hola [nombre]! Tanto tiempo 🙌
 Te escribo por algo puntual: estoy montando soluciones con IA para negocios (${capacidad.descripcion}) y estoy eligiendo mis primeros 3 casos de estudio. Me acordé de ti por tu negocio de ${rubro.nombre.toLowerCase()}.
 
-Me regalas 15 min? Te hago unas preguntas sobre cómo manejas el tema de que ${dolor}, y te propongo UNA mejora concreta, con precio cerrado (referencia real: ${precioTexto}). Si te sirve, la hacemos esta misma semana. Si no, te quedas con el diagnóstico gratis igual. ¿Te acomoda esta semana?`;
+¿Tienes 15 minutos? Te hago unas preguntas sobre cómo manejas el tema de que ${dolor}, y te propongo UNA mejora concreta, con precio cerrado (referencia real: ${precioTexto}). Si te sirve, la hacemos esta misma semana. Si no, te quedas con el diagnóstico gratis igual. ¿Te viene bien esta semana?`;
 
   document.getElementById("mensaje-texto").textContent = mensaje;
 
@@ -149,8 +282,10 @@ function setupEventos() {
     setTimeout(() => (btn.textContent = original), 1500);
   });
   document.getElementById("aportar-btn").addEventListener("click", () => {
-    window.open(`${REPO_URL}/blob/main/casos/README.md`, "_blank");
+    document.getElementById("aportar").scrollIntoView({ behavior: "smooth" });
+    document.getElementById("af-autor").focus();
   });
+  document.getElementById("aportar-form").addEventListener("submit", manejarAporte);
 }
 
 (async function init() {

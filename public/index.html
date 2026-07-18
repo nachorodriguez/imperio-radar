@@ -64,6 +64,95 @@
     </div>
   </section>
 
+  <section id="aportar">
+    <h2>Aporta tu caso</h2>
+    <p class="section-sub">¿Cerraste una venta? Completa esto y te abrimos GitHub con el archivo ya armado — no hace falta saber usar Git. Si no tienes permiso de escritura en el repo, GitHub te ofrece hacer tu propia copia y abre el Pull Request solo.</p>
+
+    <form id="aportar-form">
+      <div class="field-row">
+        <div>
+          <label for="af-autor">Tu nombre</label>
+          <input type="text" id="af-autor" required>
+        </div>
+        <div>
+          <label for="af-perfil">Tu perfil de Skool (opcional)</label>
+          <input type="text" id="af-perfil" placeholder="https://www.skool.com/@...">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div>
+          <label for="af-pais">País</label>
+          <select id="af-pais" required></select>
+        </div>
+        <div>
+          <label for="af-rubro">Rubro del cliente</label>
+          <select id="af-rubro" required></select>
+        </div>
+        <div>
+          <label for="af-construyo">Qué construiste</label>
+          <select id="af-construyo" required></select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div style="flex:1; min-width:280px;">
+          <label for="af-dolor">Dolor específico que resolviste</label>
+          <input type="text" id="af-dolor" style="width:100%;" placeholder="ej. se perdían citas de último minuto" required>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div>
+          <label for="af-precio">Precio de implementación</label>
+          <input type="text" id="af-precio" inputmode="decimal" required>
+        </div>
+        <div>
+          <label for="af-moneda">Moneda</label>
+          <select id="af-moneda"></select>
+        </div>
+        <div>
+          <label for="af-mantenimiento">Mantenimiento mensual (opcional)</label>
+          <input type="text" id="af-mantenimiento" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div>
+          <label for="af-dias">Días hasta cobrar (opcional)</label>
+          <input type="text" id="af-dias" inputmode="numeric">
+        </div>
+        <div>
+          <label for="af-origen">De dónde salió el cliente</label>
+          <select id="af-origen">
+            <option value="pajaro_en_mano">Pájaro en mano (contacto cercano)</option>
+            <option value="recomendacion">Recomendación</option>
+            <option value="red_social">Red social / contenido</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div>
+          <label for="af-yatenia">¿Ya tenías el contacto antes de construir?</label>
+          <select id="af-yatenia">
+            <option value="true">Sí</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div style="flex:1; min-width:280px;">
+          <label for="af-link">Link a tu post de cierre en Skool (opcional)</label>
+          <input type="text" id="af-link" style="width:100%;" placeholder="https://www.skool.com/imperio/...">
+        </div>
+      </div>
+
+      <button type="submit">Abrir en GitHub →</button>
+    </form>
+
+    <p class="section-sub" id="af-nota" style="margin-top:16px;"></p>
+  </section>
+
   <footer>
     <p>Este radar crece con cada venta que la comunidad reporta. Si cerraste un cliente esta semana, súmalo — el <a href="https://github.com/" id="repo-link" target="_blank" rel="noopener">repo está abierto</a> para todos los Imperiales.</p>
   </footer>
