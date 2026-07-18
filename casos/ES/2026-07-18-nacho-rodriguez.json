@@ -1,0 +1,24 @@
+{
+  "id": "2026-07-18-nacho-rodriguez",
+  "autor": "Nacho Rodriguez",
+  "perfil_skool": "https://www.skool.com/@nacho-rodriguez-8517?g=imperio",
+  "pais": "ES",
+  "fecha_cierre": "2026-07-18",
+  "rubro": "seguros",
+  "rubro_otro": null,
+  "dolor_especifico": "perdian citas",
+  "que_construyo": "agente_whatsapp",
+  "ya_tenia_cliente": true,
+  "precio_implementacion": 1000,
+  "moneda": "EUR",
+  "precio_implementacion_usd": null,
+  "mantenimiento_mensual": 200,
+  "mantenimiento_moneda": "EUR",
+  "tiempo_hasta_cobro_dias": null,
+  "origen_cliente": "pajaro_en_mano",
+  "mensaje_usado": null,
+  "link_caso": null,
+  "tags": [
+    "comunidad"
+  ]
+}
