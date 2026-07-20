@@ -1,0 +1,24 @@
+{
+  "id": "2026-07-20-nadia-castellanos-robles-p4hy",
+  "autor": "Nadia Castellanos Robles",
+  "perfil_skool": "https://www.skool.com/@nadia-castellanos-robles-3094?g=imperio",
+  "pais": "ES",
+  "fecha_cierre": "2026-07-20",
+  "rubro": "hoteles",
+  "rubro_otro": null,
+  "dolor_especifico": "He creado un agente de reservas y cobro ( a través de Stripe ) para personas / empresas que gestionan apartametnos turísticos / pequeños establecimientos turísticos.",
+  "que_construyo": "agente_whatsapp",
+  "ya_tenia_cliente": true,
+  "precio_implementacion": 0,
+  "moneda": "EUR",
+  "precio_implementacion_usd": null,
+  "mantenimiento_mensual": 0,
+  "mantenimiento_moneda": "EUR",
+  "tiempo_hasta_cobro_dias": 0,
+  "origen_cliente": "otro",
+  "mensaje_usado": null,
+  "link_caso": null,
+  "tags": [
+    "comunidad"
+  ]
+}
