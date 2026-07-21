@@ -1,6 +1,6 @@
 {
-  "generado_en": "2026-07-18T23:50:33.572Z",
-  "total_casos": 9,
+  "generado_en": "2026-07-21T06:43:15.745Z",
+  "total_casos": 11,
   "casos": [
     {
       "id": "2026-07-18-nacho-rodriguez-j15c",
@@ -44,6 +44,54 @@
       "mantenimiento_moneda": "EUR",
       "tiempo_hasta_cobro_dias": null,
       "origen_cliente": "pajaro_en_mano",
+      "mensaje_usado": null,
+      "link_caso": null,
+      "tags": [
+        "comunidad"
+      ]
+    },
+    {
+      "id": "2026-07-19-nacho-rodriguez-jg2h",
+      "autor": "Nacho Rodriguez",
+      "perfil_skool": "https://www.skool.com/@nacho-rodriguez-8517?g=imperio",
+      "pais": "ES",
+      "fecha_cierre": "2026-07-19",
+      "rubro": "inmobiliarias",
+      "rubro_otro": null,
+      "dolor_especifico": "GEO aparicion motores iA",
+      "que_construyo": "web_landing",
+      "ya_tenia_cliente": false,
+      "precio_implementacion": 1000,
+      "moneda": "EUR",
+      "precio_implementacion_usd": null,
+      "mantenimiento_mensual": 150,
+      "mantenimiento_moneda": "EUR",
+      "tiempo_hasta_cobro_dias": 0,
+      "origen_cliente": "recomendacion",
+      "mensaje_usado": null,
+      "link_caso": null,
+      "tags": [
+        "comunidad"
+      ]
+    },
+    {
+      "id": "2026-07-20-nadia-castellanos-robles-p4hy",
+      "autor": "Nadia Castellanos Robles",
+      "perfil_skool": "https://www.skool.com/@nadia-castellanos-robles-3094?g=imperio",
+      "pais": "ES",
+      "fecha_cierre": "2026-07-20",
+      "rubro": "hoteles",
+      "rubro_otro": null,
+      "dolor_especifico": "He creado un agente de reservas y cobro ( a través de Stripe ) para personas / empresas que gestionan apartametnos turísticos / pequeños establecimientos turísticos.",
+      "que_construyo": "agente_whatsapp",
+      "ya_tenia_cliente": true,
+      "precio_implementacion": 0,
+      "moneda": "EUR",
+      "precio_implementacion_usd": null,
+      "mantenimiento_mensual": 0,
+      "mantenimiento_moneda": "EUR",
+      "tiempo_hasta_cobro_dias": 0,
+      "origen_cliente": "otro",
       "mensaje_usado": null,
       "link_caso": null,
       "tags": [

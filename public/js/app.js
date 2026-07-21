@@ -69,7 +69,21 @@ function poblarSelects() {
     if (sugerida) afMoneda.value = sugerida;
   });
 
+  // Si elige "Otro rubro", pedimos el detalle en texto libre — así no se pierde
+  // el dato y el catálogo puede crecer con lo que la comunidad realmente vende.
+  afRubro.addEventListener("change", () => {
+    const esOtro = afRubro.value === "otro";
+    document.getElementById("af-rubro-otro-row").style.display = esOtro ? "" : "none";
+    document.getElementById("af-rubro-otro").required = esOtro;
+  });
+
   document.getElementById("repo-link").href = REPO_URL;
+}
+
+function formatearFecha(iso) {
+  const [y, m, d] = String(iso).split("-");
+  const meses = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  return `${Number(d)} ${meses[Number(m) - 1]} ${y}`;
 }
 
 function nivelSaturacion(n) {
@@ -83,6 +97,20 @@ function mediana(nums) {
   const s = [...nums].sort((a, b) => a - b);
   const mid = Math.floor(s.length / 2);
   return s.length % 2 ? s[mid] : Math.round((s[mid - 1] + s[mid]) / 2);
+}
+
+function listaCasosHtml(casos) {
+  return casos.map(c => `
+    <li>
+      <div class="caso-autor">${c.autor}${c.pais ? ` · ${c.pais}` : ""}${c.fecha_cierre ? ` · ${formatearFecha(c.fecha_cierre)}` : ""}</div>
+      <div class="caso-detalle-texto">${c.rubro === "otro" && c.rubro_otro ? `${c.rubro_otro} · ` : ""}${nombreCapacidad(c.que_construyo)}${typeof c.precio_implementacion === "number" ? ` · ${MONEDA_SIMBOLO[c.moneda] || c.moneda} ${c.precio_implementacion}` : ""}</div>
+      <div class="caso-links">
+        ${c.perfil_skool ? `<a href="${c.perfil_skool}" target="_blank" rel="noopener">Perfil de Skool</a>` : ""}
+        ${c.link_caso ? `<a href="${c.link_caso}" target="_blank" rel="noopener">Ver post de cierre</a>` : ""}
+        ${!c.perfil_skool && !c.link_caso ? `<span class="sin-contacto">sin contacto compartido</span>` : ""}
+      </div>
+    </li>
+  `).join("");
 }
 
 function renderRadar() {
@@ -132,24 +160,41 @@ function renderRadar() {
       ${casosParaListar.length ? `
         <details class="casos-detalle">
           <summary>Ver ${casosParaListar.length === 1 ? "el caso real" : `los ${casosParaListar.length} casos reales`}</summary>
-          <ul>
-            ${casosParaListar.map(c => `
-              <li>
-                <div class="caso-autor">${c.autor}${c.pais ? ` · ${c.pais}` : ""}</div>
-                <div class="caso-detalle-texto">${nombreCapacidad(c.que_construyo)}${typeof c.precio_implementacion === "number" ? ` · ${MONEDA_SIMBOLO[c.moneda] || c.moneda} ${c.precio_implementacion}` : ""}</div>
-                <div class="caso-links">
-                  ${c.perfil_skool ? `<a href="${c.perfil_skool}" target="_blank" rel="noopener">Perfil de Skool</a>` : ""}
-                  ${c.link_caso ? `<a href="${c.link_caso}" target="_blank" rel="noopener">Ver post de cierre</a>` : ""}
-                  ${!c.perfil_skool && !c.link_caso ? `<span class="sin-contacto">sin contacto compartido</span>` : ""}
-                </div>
-              </li>
-            `).join("")}
-          </ul>
+          <ul>${listaCasosHtml(casosParaListar)}</ul>
         </details>
       ` : ""}
     `;
     grid.appendChild(card);
   });
+
+  renderCardOtros(paisFiltro, grid);
+}
+
+// Los casos con rubro "otro" no encajan en ninguna tarjeta fija del catálogo,
+// pero igual deben ser visibles — así la comunidad ve qué rubros nuevos están
+// apareciendo y se puede decidir agregarlos a rubros.json.
+function renderCardOtros(paisFiltro, grid) {
+  const casosOtro = CASOS.filter(c => c.rubro === "otro");
+  const casosLocales = paisFiltro ? casosOtro.filter(c => c.pais === paisFiltro) : casosOtro;
+  if (!casosLocales.length) return;
+
+  const casosParaListar = casosLocales
+    .slice()
+    .sort((a, b) => (b.fecha_cierre || "").localeCompare(a.fecha_cierre || ""));
+
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <p class="sector">${paisFiltro ? "en tu país" : "global"}</p>
+    <h3>Otros rubros</h3>
+    <div class="stat-row"><span>Casos registrados</span><strong>${casosLocales.length}</strong></div>
+    <p class="section-sub" style="margin:8px 0 0;">Rubros fuera del catálogo cerrado — si uno se repite, vale la pena agregarlo a <code>rubros.json</code>.</p>
+    <details class="casos-detalle" open>
+      <summary>Ver ${casosParaListar.length === 1 ? "el caso real" : `los ${casosParaListar.length} casos reales`}</summary>
+      <ul>${listaCasosHtml(casosParaListar)}</ul>
+    </details>
+  `;
+  grid.appendChild(card);
 }
 
 function nombreCapacidad(id) {
@@ -173,6 +218,7 @@ async function manejarAporte(e) {
   const perfil = document.getElementById("af-perfil").value.trim() || null;
   const pais = document.getElementById("af-pais").value;
   const rubro = document.getElementById("af-rubro").value;
+  const rubroOtro = document.getElementById("af-rubro-otro").value.trim() || null;
   const construyo = document.getElementById("af-construyo").value;
   const dolor = document.getElementById("af-dolor").value.trim();
   const precioStr = document.getElementById("af-precio").value.trim();
@@ -187,12 +233,17 @@ async function manejarAporte(e) {
     nota.textContent = "Faltan campos obligatorios — revisa nombre, país, rubro, qué construiste, dolor y precio.";
     return;
   }
+  if (rubro === "otro" && !rubroOtro) {
+    nota.textContent = "Contanos cuál es el rubro de tu cliente — así lo podemos sumar al catálogo.";
+    return;
+  }
 
   const payload = {
     autor,
     perfil_skool: perfil,
     pais,
     rubro,
+    rubro_otro: rubro === "otro" ? rubroOtro : null,
     que_construyo: construyo,
     dolor_especifico: dolor,
     precio_implementacion: Number(precioStr),
@@ -222,6 +273,8 @@ async function manejarAporte(e) {
         (result.prUrl ? `<a href="${result.prUrl}" target="_blank" rel="noopener">Ver el PR aquí</a>. ` : "") +
         `En cuanto se apruebe, va a aparecer en el Radar.`;
       document.getElementById("aportar-form").reset();
+      document.getElementById("af-rubro-otro-row").style.display = "none";
+      document.getElementById("af-rubro-otro").required = false;
     } else {
       nota.textContent = result.error || "Algo falló al enviar tu caso. Intenta de nuevo.";
     }

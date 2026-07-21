@@ -63,6 +63,7 @@ export default async (req: Request, context: Context) => {
   const perfilSkool = data.perfil_skool ? String(data.perfil_skool).trim() : null;
   const pais = String(data.pais || "").trim();
   const rubro = String(data.rubro || "").trim();
+  const rubroOtro = data.rubro_otro ? String(data.rubro_otro).trim() : null;
   const queConstruyo = String(data.que_construyo || "").trim();
   const dolorEspecifico = String(data.dolor_especifico || "").trim();
   const precioImplementacion = Number(data.precio_implementacion);
@@ -79,6 +80,9 @@ export default async (req: Request, context: Context) => {
       !Number.isFinite(precioImplementacion) || !moneda) {
     return new Response(JSON.stringify({ ok: false, error: "Faltan campos obligatorios" }), { status: 400 });
   }
+  if (rubro === "otro" && !rubroOtro) {
+    return new Response(JSON.stringify({ ok: false, error: "Falta indicar cuál es el rubro" }), { status: 400 });
+  }
 
   const fecha = hoyISO();
   const slug = slugify(autor) || "imperial";
@@ -94,7 +98,7 @@ export default async (req: Request, context: Context) => {
     pais,
     fecha_cierre: fecha,
     rubro,
-    rubro_otro: null,
+    rubro_otro: rubro === "otro" ? rubroOtro : null,
     dolor_especifico: dolorEspecifico,
     que_construyo: queConstruyo,
     ya_tenia_cliente: yaTeniaCliente,
@@ -133,16 +137,21 @@ export default async (req: Request, context: Context) => {
     const pr = await gh(`/pulls`, token, {
       method: "POST",
       body: JSON.stringify({
-        title: `Nuevo caso: ${autor} — ${rubro} (${pais})`,
+        title: rubro === "otro" && rubroOtro
+          ? `Nuevo caso: ${autor} — ${rubroOtro} (${pais}) [rubro fuera de catálogo]`
+          : `Nuevo caso: ${autor} — ${rubro} (${pais})`,
         head: branch,
         base: "main",
         body: [
           "Caso aportado desde el formulario del Radar Imperial.",
           "",
-          `- Rubro: ${rubro}`,
+          `- Rubro: ${rubro}${rubroOtro ? ` (detalle: ${rubroOtro})` : ""}`,
           `- País: ${pais}`,
           `- Qué construyó: ${queConstruyo}`,
           `- Precio: ${precioImplementacion} ${moneda}`,
+          ...(rubro === "otro" && rubroOtro
+            ? ["", `⚠️ Rubro fuera del catálogo cerrado — evaluar si conviene agregar "${rubroOtro}" a rubros.json.`]
+            : []),
         ].join("\n"),
       }),
     });
