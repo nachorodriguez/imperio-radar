@@ -63,6 +63,9 @@ function poblarSelects() {
     afRubro.add(new Option(r.nombre, r.id));
   });
 
+  const rubroFiltro = document.getElementById("rubro-filtro");
+  RUBROS.filter(r => r.id !== "otro").forEach(r => rubroFiltro.add(new Option(r.nombre, r.id)));
+
   // Auto-sugiere la moneda cuando cambia el país del formulario de aporte.
   afPais.addEventListener("change", () => {
     const sugerida = PAIS_MONEDA[afPais.value];
@@ -99,26 +102,41 @@ function mediana(nums) {
   return s.length % 2 ? s[mid] : Math.round((s[mid - 1] + s[mid]) / 2);
 }
 
+// "sin confirmar" es el placeholder que usan los casos semilla cuando no se
+// sabe el rubro real — no es un nombre de rubro válido para agrupar ni mostrar.
+function esRubroOtroValido(texto) {
+  return !!texto && texto.trim().toLowerCase() !== "sin confirmar";
+}
+
 function listaCasosHtml(casos) {
-  return casos.map(c => `
+  return casos.map(c => {
+    const detalle = [
+      c.rubro === "otro" && esRubroOtroValido(c.rubro_otro) ? c.rubro_otro : null,
+      c.que_construyo ? nombreCapacidad(c.que_construyo) : null,
+      typeof c.precio_implementacion === "number" ? `${MONEDA_SIMBOLO[c.moneda] || c.moneda} ${c.precio_implementacion}` : null,
+    ].filter(Boolean).join(" · ");
+    return `
     <li>
       <div class="caso-autor">${c.autor}${c.pais ? ` · ${c.pais}` : ""}${c.fecha_cierre ? ` · ${formatearFecha(c.fecha_cierre)}` : ""}</div>
-      <div class="caso-detalle-texto">${c.rubro === "otro" && c.rubro_otro ? `${c.rubro_otro} · ` : ""}${nombreCapacidad(c.que_construyo)}${typeof c.precio_implementacion === "number" ? ` · ${MONEDA_SIMBOLO[c.moneda] || c.moneda} ${c.precio_implementacion}` : ""}</div>
+      ${detalle ? `<div class="caso-detalle-texto">${detalle}</div>` : ""}
       <div class="caso-links">
         ${c.perfil_skool ? `<a href="${c.perfil_skool}" target="_blank" rel="noopener">Perfil de Skool</a>` : ""}
         ${c.link_caso ? `<a href="${c.link_caso}" target="_blank" rel="noopener">Ver post de cierre</a>` : ""}
         ${!c.perfil_skool && !c.link_caso ? `<span class="sin-contacto">sin contacto compartido</span>` : ""}
       </div>
-    </li>
-  `).join("");
+    </li>`;
+  }).join("");
 }
 
 function renderRadar() {
   const paisFiltro = document.getElementById("pais-filtro").value;
+  const rubroFiltro = document.getElementById("rubro-filtro").value;
   const grid = document.getElementById("radar-grid");
   grid.innerHTML = "";
 
-  RUBROS.filter(r => r.id !== "otro").forEach(rubro => {
+  RUBROS.filter(r => r.id !== "otro")
+    .filter(r => !rubroFiltro || r.id === rubroFiltro)
+    .forEach(rubro => {
     const casosRubro = CASOS.filter(c => c.rubro === rubro.id);
     const casosLocales = paisFiltro
       ? casosRubro.filter(c => c.pais === paisFiltro)
@@ -167,34 +185,54 @@ function renderRadar() {
     grid.appendChild(card);
   });
 
-  renderCardOtros(paisFiltro, grid);
+  // El filtro de rubro solo aplica al catálogo cerrado — "otros rubros" es
+  // territorio sin catalogar, así que no tiene sentido aislarlo con ese filtro.
+  if (!rubroFiltro) renderCardsOtros(paisFiltro, grid);
 }
 
 // Los casos con rubro "otro" no encajan en ninguna tarjeta fija del catálogo,
-// pero igual deben ser visibles — así la comunidad ve qué rubros nuevos están
-// apareciendo y se puede decidir agregarlos a rubros.json.
-function renderCardOtros(paisFiltro, grid) {
+// pero igual deben ser visibles. En vez de amontonarlos en una sola lista que
+// crece sin límite, se agrupan por el texto libre que puso cada persona: así
+// un rubro que se repite (ej. "veterinarias" x5) salta a la vista como
+// candidato a sumarse a rubros.json, en vez de perderse en un scroll larguísimo.
+function renderCardsOtros(paisFiltro, grid) {
   const casosOtro = CASOS.filter(c => c.rubro === "otro");
   const casosLocales = paisFiltro ? casosOtro.filter(c => c.pais === paisFiltro) : casosOtro;
   if (!casosLocales.length) return;
 
-  const casosParaListar = casosLocales
-    .slice()
-    .sort((a, b) => (b.fecha_cierre || "").localeCompare(a.fecha_cierre || ""));
+  const grupos = new Map(); // clave normalizada -> { etiqueta, casos[] }
+  const sinConfirmar = [];
+
+  casosLocales.forEach(c => {
+    if (!esRubroOtroValido(c.rubro_otro)) { sinConfirmar.push(c); return; }
+    const clave = c.rubro_otro.trim().toLowerCase();
+    if (!grupos.has(clave)) grupos.set(clave, { etiqueta: c.rubro_otro.trim(), casos: [] });
+    grupos.get(clave).casos.push(c);
+  });
+
+  const gruposOrdenados = [...grupos.values()].sort((a, b) => b.casos.length - a.casos.length);
+  gruposOrdenados.forEach(g => grid.appendChild(cardOtro(paisFiltro, g.etiqueta, g.casos)));
+
+  if (sinConfirmar.length) grid.appendChild(cardOtro(paisFiltro, "Sin rubro confirmado", sinConfirmar));
+}
+
+function cardOtro(paisFiltro, titulo, casos) {
+  const casosParaListar = casos.slice().sort((a, b) => (b.fecha_cierre || "").localeCompare(a.fecha_cierre || ""));
+  const candidato = casos.length > 1;
 
   const card = document.createElement("div");
   card.className = "card";
   card.innerHTML = `
-    <p class="sector">${paisFiltro ? "en tu país" : "global"}</p>
-    <h3>Otros rubros</h3>
-    <div class="stat-row"><span>Casos registrados</span><strong>${casosLocales.length}</strong></div>
-    <p class="section-sub" style="margin:8px 0 0;">Rubros fuera del catálogo cerrado — si uno se repite, vale la pena agregarlo a <code>rubros.json</code>.</p>
-    <details class="casos-detalle" open>
+    <p class="sector">${paisFiltro ? "en tu país" : "global"} · fuera de catálogo</p>
+    <h3>${titulo}</h3>
+    <div class="stat-row"><span>Casos registrados</span><strong>${casos.length}</strong></div>
+    ${candidato ? `<p class="section-sub" style="margin:8px 0 0;">Se repite ${casos.length} veces — candidato a sumarse a <code>rubros.json</code>.</p>` : ""}
+    <details class="casos-detalle">
       <summary>Ver ${casosParaListar.length === 1 ? "el caso real" : `los ${casosParaListar.length} casos reales`}</summary>
       <ul>${listaCasosHtml(casosParaListar)}</ul>
     </details>
   `;
-  grid.appendChild(card);
+  return card;
 }
 
 function nombreCapacidad(id) {
@@ -345,6 +383,7 @@ Te escribo por algo puntual: estoy montando soluciones con IA para negocios (${c
 
 function setupEventos() {
   document.getElementById("pais-filtro").addEventListener("change", renderRadar);
+  document.getElementById("rubro-filtro").addEventListener("change", renderRadar);
   document.getElementById("generar-btn").addEventListener("click", generarMensaje);
   document.getElementById("copiar-btn").addEventListener("click", () => {
     navigator.clipboard.writeText(document.getElementById("mensaje-texto").textContent);
