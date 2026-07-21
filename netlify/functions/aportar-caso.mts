@@ -65,6 +65,7 @@ export default async (req: Request, context: Context) => {
   const rubro = String(data.rubro || "").trim();
   const rubroOtro = data.rubro_otro ? String(data.rubro_otro).trim() : null;
   const queConstruyo = String(data.que_construyo || "").trim();
+  const queConstruyoOtro = data.que_construyo_otro ? String(data.que_construyo_otro).trim() : null;
   const dolorEspecifico = String(data.dolor_especifico || "").trim();
   const precioImplementacion = Number(data.precio_implementacion);
   const moneda = String(data.moneda || "").trim();
@@ -82,6 +83,9 @@ export default async (req: Request, context: Context) => {
   }
   if (rubro === "otro" && !rubroOtro) {
     return new Response(JSON.stringify({ ok: false, error: "Falta indicar cuál es el rubro" }), { status: 400 });
+  }
+  if (queConstruyo === "otro" && !queConstruyoOtro) {
+    return new Response(JSON.stringify({ ok: false, error: "Falta indicar qué construiste" }), { status: 400 });
   }
 
   const fecha = hoyISO();
@@ -101,6 +105,7 @@ export default async (req: Request, context: Context) => {
     rubro_otro: rubro === "otro" ? rubroOtro : null,
     dolor_especifico: dolorEspecifico,
     que_construyo: queConstruyo,
+    que_construyo_otro: queConstruyo === "otro" ? queConstruyoOtro : null,
     ya_tenia_cliente: yaTeniaCliente,
     precio_implementacion: precioImplementacion,
     moneda,
@@ -134,6 +139,14 @@ export default async (req: Request, context: Context) => {
       }),
     });
 
+    const avisos: string[] = [];
+    if (rubro === "otro" && rubroOtro) {
+      avisos.push(`⚠️ Rubro fuera del catálogo cerrado — evaluar si conviene agregar "${rubroOtro}" a rubros.json.`);
+    }
+    if (queConstruyo === "otro" && queConstruyoOtro) {
+      avisos.push(`⚠️ "Qué construyó" fuera del catálogo — evaluar si conviene agregar "${queConstruyoOtro}" a capacidades.json.`);
+    }
+
     const pr = await gh(`/pulls`, token, {
       method: "POST",
       body: JSON.stringify({
@@ -147,11 +160,9 @@ export default async (req: Request, context: Context) => {
           "",
           `- Rubro: ${rubro}${rubroOtro ? ` (detalle: ${rubroOtro})` : ""}`,
           `- País: ${pais}`,
-          `- Qué construyó: ${queConstruyo}`,
+          `- Qué construyó: ${queConstruyo}${queConstruyoOtro ? ` (detalle: ${queConstruyoOtro})` : ""}`,
           `- Precio: ${precioImplementacion} ${moneda}`,
-          ...(rubro === "otro" && rubroOtro
-            ? ["", `⚠️ Rubro fuera del catálogo cerrado — evaluar si conviene agregar "${rubroOtro}" a rubros.json.`]
-            : []),
+          ...(avisos.length ? ["", ...avisos] : []),
         ].join("\n"),
       }),
     });

@@ -18,5 +18,10 @@
     "id": "diagnostico_roadmap",
     "nombre": "Diagnóstico IA + roadmap",
     "descripcion": "15 min de preguntas + plan de qué automatizar primero"
+  },
+  {
+    "id": "otro",
+    "nombre": "Otro (no está en la lista)",
+    "descripcion": "algo distinto, adaptado a lo que necesitaba el negocio"
   }
 ]

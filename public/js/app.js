@@ -72,12 +72,18 @@ function poblarSelects() {
     if (sugerida) afMoneda.value = sugerida;
   });
 
-  // Si elige "Otro rubro", pedimos el detalle en texto libre — así no se pierde
-  // el dato y el catálogo puede crecer con lo que la comunidad realmente vende.
+  // Si elige "Otro rubro" o "Otro" en qué construiste, pedimos el detalle en
+  // texto libre — así no se pierde el dato y el catálogo puede crecer con lo
+  // que la comunidad realmente vende y construye.
   afRubro.addEventListener("change", () => {
     const esOtro = afRubro.value === "otro";
     document.getElementById("af-rubro-otro-row").style.display = esOtro ? "" : "none";
     document.getElementById("af-rubro-otro").required = esOtro;
+  });
+  afConstruyo.addEventListener("change", () => {
+    const esOtro = afConstruyo.value === "otro";
+    document.getElementById("af-construyo-otro-row").style.display = esOtro ? "" : "none";
+    document.getElementById("af-construyo-otro").required = esOtro;
   });
 
   document.getElementById("repo-link").href = REPO_URL;
@@ -108,11 +114,18 @@ function esRubroOtroValido(texto) {
   return !!texto && texto.trim().toLowerCase() !== "sin confirmar";
 }
 
+// Igual que con el rubro: si construyó algo fuera del catálogo, mostramos su
+// propia descripción en vez del genérico "Otro (no está en la lista)".
+function descripcionCapacidad(c) {
+  if (c.que_construyo === "otro" && c.que_construyo_otro) return c.que_construyo_otro;
+  return c.que_construyo ? nombreCapacidad(c.que_construyo) : null;
+}
+
 function listaCasosHtml(casos) {
   return casos.map(c => {
     const detalle = [
       c.rubro === "otro" && esRubroOtroValido(c.rubro_otro) ? c.rubro_otro : null,
-      c.que_construyo ? nombreCapacidad(c.que_construyo) : null,
+      descripcionCapacidad(c),
       typeof c.precio_implementacion === "number" ? `${MONEDA_SIMBOLO[c.moneda] || c.moneda} ${c.precio_implementacion}` : null,
     ].filter(Boolean).join(" · ");
     return `
@@ -258,6 +271,7 @@ async function manejarAporte(e) {
   const rubro = document.getElementById("af-rubro").value;
   const rubroOtro = document.getElementById("af-rubro-otro").value.trim() || null;
   const construyo = document.getElementById("af-construyo").value;
+  const construyoOtro = document.getElementById("af-construyo-otro").value.trim() || null;
   const dolor = document.getElementById("af-dolor").value.trim();
   const precioStr = document.getElementById("af-precio").value.trim();
   const moneda = document.getElementById("af-moneda").value;
@@ -275,6 +289,10 @@ async function manejarAporte(e) {
     nota.textContent = "Contanos cuál es el rubro de tu cliente — así lo podemos sumar al catálogo.";
     return;
   }
+  if (construyo === "otro" && !construyoOtro) {
+    nota.textContent = "Contanos qué construiste — así lo podemos sumar al catálogo.";
+    return;
+  }
 
   const payload = {
     autor,
@@ -283,6 +301,7 @@ async function manejarAporte(e) {
     rubro,
     rubro_otro: rubro === "otro" ? rubroOtro : null,
     que_construyo: construyo,
+    que_construyo_otro: construyo === "otro" ? construyoOtro : null,
     dolor_especifico: dolor,
     precio_implementacion: Number(precioStr),
     moneda,
@@ -313,6 +332,8 @@ async function manejarAporte(e) {
       document.getElementById("aportar-form").reset();
       document.getElementById("af-rubro-otro-row").style.display = "none";
       document.getElementById("af-rubro-otro").required = false;
+      document.getElementById("af-construyo-otro-row").style.display = "none";
+      document.getElementById("af-construyo-otro").required = false;
     } else {
       nota.textContent = result.error || "Algo falló al enviar tu caso. Intenta de nuevo.";
     }

@@ -8,6 +8,7 @@
   "rubro_otro": null,
   "dolor_especifico": "descripción corta y concreta del dolor que resolviste",
   "que_construyo": "sistema_interno",
+  "que_construyo_otro": null,
   "ya_tenia_cliente": true,
   "precio_implementacion": 0,
   "moneda": "USD",
